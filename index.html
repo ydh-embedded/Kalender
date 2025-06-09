@@ -19,14 +19,43 @@
 
         .calendar-container {
             width: 300mm;
-            height: 100mm;
+            height: 110mm;
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             display: flex;
+            flex-direction: column;
             overflow: hidden;
-            transform: scale(0.5);
+            transform: scale(0.45);
             transform-origin: center;
+        }
+
+        .hole-punching-area {
+            height: 10mm;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #e8d5e8;
+            position: relative;
+        }
+
+        .hole-marks {
+            display: flex;
+            gap: 50mm;
+        }
+
+        .hole-mark {
+            width: 6mm;
+            height: 6mm;
+            border: 2px dashed #c8a2c8;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .calendar-content {
+            height: 100mm;
+            display: flex;
         }
 
         .month-section {
@@ -167,11 +196,94 @@
             background: #8b7fb8;
             color: white;
         }
+
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .print-btn {
+            background: #8b7fb8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .print-btn:hover {
+            background: #6b5b95;
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .calendar-container {
+                transform: none;
+                box-shadow: none;
+                border-radius: 0;
+                width: 300mm;
+                height: 110mm;
+                margin: 0;
+            }
+            
+            .print-controls {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="print-controls">
+        <h4 style="margin-top: 0; color: #8b7fb8;">Druckoptionen</h4>
+        <div style="margin-bottom: 10px;">
+            <button class="print-btn" onclick="printCurrentMonth()">Aktuellen Monat drucken</button>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button class="print-btn" onclick="printAllMonths()">Alle 12 Monate drucken</button>
+        </div>
+        <div>
+            <select id="monthSelect" onchange="changeToMonth(this.value)" style="padding: 5px; border-radius: 4px; border: 1px solid #c8a2c8;">
+                <option value="0">Januar</option>
+                <option value="1">Februar</option>
+                <option value="2">März</option>
+                <option value="3">April</option>
+                <option value="4">Mai</option>
+                <option value="5" selected>Juni</option>
+                <option value="6">Juli</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">Oktober</option>
+                <option value="10">November</option>
+                <option value="11">Dezember</option>
+            </select>
+        </div>
+    </div>
+
     <div class="calendar-container">
-        <div class="month-section">
+        <div class="hole-punching-area">
+            <div class="hole-marks">
+                <div class="hole-mark"></div>
+                <div class="hole-mark"></div>
+                <div class="hole-mark"></div>
+            </div>
+        </div>
+        
+        <div class="calendar-content">
+            <div class="month-section">
             <div class="decorative-element"></div>
             <div class="month-selector">
                 <button class="month-btn" onclick="changeMonth(-1)">‹</button>
@@ -282,6 +394,42 @@
                 currentDate.setMonth(currentDate.getMonth() + 1);
             }
             generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            document.getElementById('monthSelect').value = currentDate.getMonth();
+        }
+
+        function changeToMonth(monthIndex) {
+            currentDate.setMonth(parseInt(monthIndex));
+            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        }
+
+        function printCurrentMonth() {
+            window.print();
+        }
+
+        function printAllMonths() {
+            const originalMonth = currentDate.getMonth();
+            
+            // Funktion zum Drucken aller Monate nacheinander
+            let monthIndex = 0;
+            function printNextMonth() {
+                if (monthIndex < 12) {
+                    currentDate.setMonth(monthIndex);
+                    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+                    
+                    setTimeout(() => {
+                        window.print();
+                        monthIndex++;
+                        setTimeout(() => printNextMonth(), 1000); // Kurze Pause zwischen den Druckvorgängen
+                    }, 500);
+                } else {
+                    // Zurück zum ursprünglichen Monat
+                    currentDate.setMonth(originalMonth);
+                    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+                    document.getElementById('monthSelect').value = originalMonth;
+                }
+            }
+            
+            printNextMonth();
         }
 
         // Initial laden
