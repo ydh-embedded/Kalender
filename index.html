@@ -18,7 +18,7 @@
         }
 
         .calendar-container {
-            width: 300mm;
+            width: 344mm;
             height: 110mm;
             background: white;
             border-radius: 12px;
@@ -26,7 +26,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: scale(0.45);
+            transform: scale(0.4);
             transform-origin: center;
         }
 
@@ -42,7 +42,7 @@
 
         .hole-marks {
             display: flex;
-            gap: 50mm;
+            gap: 60mm;
         }
 
         .hole-mark {
@@ -56,6 +56,66 @@
         .calendar-content {
             height: 100mm;
             display: flex;
+        }
+
+        .logo-section {
+            width: 44mm;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-right: 1px solid #e8d5e8;
+            position: relative;
+        }
+
+        .logo-placeholder {
+            width: 35mm;
+            height: 35mm;
+            border: 2px dashed #c8a2c8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 10px;
+            color: #a89cc8;
+            text-align: center;
+            font-weight: 300;
+            line-height: 1.2;
+        }
+
+        .logo-upload {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .upload-btn {
+            background: #c8a2c8;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 8px;
+            cursor: pointer;
+        }
+
+        #logoInput {
+            display: none;
         }
 
         .month-section {
@@ -283,6 +343,16 @@
         </div>
         
         <div class="calendar-content">
+            <div class="logo-section">
+                <div class="logo-placeholder" id="logoPlaceholder">
+                    <div class="logo-text">LOGO<br>Platzhalter</div>
+                </div>
+                <div class="logo-upload">
+                    <button class="upload-btn" onclick="document.getElementById('logoInput').click()">Logo</button>
+                    <input type="file" id="logoInput" accept="image/*" onchange="loadLogo(event)">
+                </div>
+            </div>
+            
             <div class="month-section">
             <div class="decorative-element"></div>
             <div class="month-selector">
@@ -430,6 +500,19 @@
             }
             
             printNextMonth();
+        }
+
+        // Logo-Upload Funktion
+        function loadLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoPlaceholder = document.getElementById('logoPlaceholder');
+                    logoPlaceholder.innerHTML = `<img src="${e.target.result}" alt="Logo">`;
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         // Initial laden
